@@ -1,146 +1,195 @@
 # Project Plan: Full Monitoring Solution
 
-This project plan outlines all steps required to create a comprehensive monitoring solution integrating WSL, Hetzner, and Azure resources into a unified dashboard.
+This project plan outlines all steps required to create a comprehensive monitoring solution integrating local host, Hetzner, and Azure resources into a unified dashboard.
+
+## Solution architecture
+
+[Architecture](monitoring_dashboard/monitoring_architecture.md)
+
+## Plan 
 
 This plan ensures a scalable and unified monitoring solution across the infrastructure.
 
-| **Phase**                       | **Description**                                      | **Expected Time** |
-|----------------------------------|------------------------------------------------------|-------------------|
-| **Phase 1: Local Development**  | Set up and test monitoring stack on WSL.             | 1–2 days          |
-| **Phase 2: Hetzner Deployment** | Deploy monitoring stack on Hetzner with FQDN setup.  | 2–3 days          |
-| **Phase 3: Docker Monitoring**  | Monitor Docker containers on WSL and Hetzner.        | 1–2 days          |
-| **Phase 4: Host Monitoring**    | Monitor system metrics on WSL and Hetzner hosts.     | 1–2 days          |
-| **Phase 5: Azure Integration**  | Integrate Azure resources into Grafana dashboards.   | 1–2 days          |
-| **Phase 6: Unified Dashboards** | Create unified dashboards in Grafana.                | 1 day             |
-| **Phase 7: Alerts & Notifications** | Set up alerts and notifications for key metrics.  | 1 day             |
-| **Phase 8: Security**           | Define, secure, and monitor the solution’s security. | 2–3 days          |
-| **Phase 9: Optimize & Maintain**| Periodic updates, tuning, and scaling.               | Ongoing           |
-
-https://mermaid.js.org/syntax/gantt.html
-
 :::mermaid
 gantt
-    title Project Plan for Monitoring Solution
-    dateFormat  D
-    axisFormat  %d
-    
-    section Infrastructure Integration
-    Phase 1: Local Development    :p1, 1, 2d
-    Phase 2: Hetzner Deployment   :p2, after p1, 4d
-    Phase 3: Docker Monitoring    :p3, after p2, 3d
-    Phase 4: Host Monitoring      :p4, after p3, 3d
+   title Project Plan for Monitoring Solution
+   dateFormat  YYYY-MM-DD
+   axisFormat  %W
+   tickInterval 1week
+   weekday monday
+   todayMarker off
 
-    section Cloud Integration
-    Phase 5: Azure Integration    :p5, after p1, 3d
+   section App
+      Dev Env                       :core1, 2024-01-01, 1w
+      Host Monitoring               :core2, after core1, 1w
+      Docker Monitoring             :core3, after core1, 1w
+      Security Monitoring           :core3, after core1, 1w
+      Alerts & Notifications        :core5, 2024-01-22, 1w
 
-    section Dashboards & Visualization
-    Phase 6: Unified Dashboards   :p6, after p3 p4 p5, 2d
-    Phase 7: Alerts & Notifications :p7, after p6, 2d
+   section Dashboards
+      Unified Dashboards            :dash1, after core1, 1w
+      Integrate Hetzner             :dash2, after dash1, 1w
+      Integrate Azure               :dash3, after dash2, 1w
 
-    section Security and Maintenance
-    Phase 8: Security             :p8, after p2, 3d
-    Phase 9: Optimize & Maintain  :p9, 2024-11-25, 5d
+   section Adapters
+      Local Endpoint                :host1a, after core1, 1w
+      Local Exporters               :host1b, after core1, 1w
+
+      Hetzner Endpoint              :host2a, after host1b, 1w
+      Hetzner Exporters             :host2b, after host1b, 1w
+      Endpoint Security             :host2c, after host1b, 1w
+
+      Azure Endpoint                :host3a, after host2c, 1w
+      Azure Exporters               :host3b, after host2c, 1w
+
+   section Production
+      Prod Environment              :prod1, after host3b, 1w
+      Security Hardening            :prod2, after host3b, 1w
+
+   section Maintenance
+      Optimize & Maintain           :maint, after prod1, 1w
+      Security Monitoring           :sec2, after prod2, 1w
 :::
 
----
+| **Section** | **Phase** | **Description** | **Expected Time** |
+|:------------|:---------|:----------------|:-----------------:|
+| **App** | Local Dev Environment  | Set up and test monitoring stack on local host. | 1–2 days |
+|         | Host Monitoring        | Monitor system metrics on local host. | 1–2 days |
+|         | Docker Monitoring      | Monitor Docker containers on local host. | 1–2 days |
+|         | Security Monitoring      | Monitor security on local host. | 1–2 days |
+|         | Alerts & Notifications | Set up alerts and notifications for key metrics. | 1 day |
+| **Dashboards & Visualization**  | Unified Dashboards| Create unified dashboard in Grafana using local data. | 1 day |
+|                                 | Hetzner Dashboard | Integrate Hetzner metrics into unified dashboards | 1 day |
+|                                 | Azure Dashboard | Integrate Azure metrics into unified dashboards | 1 day |
+| **Host Adapters** | localhost adapter | Integrate Hetzner-specific resources into monitoring.| 1–2 days |
+|                   | Hetzner Host adapter | Integrate Hetzner-specific resources into monitoring.| 1–2 days |
+|                   | Azure Host adapter   | Integrate Azure resources into monitoring. | 1–2 days |
+| **Production environment** | Hetzner Prod Environment    | Deploy monitoring stack on Hetzner with FQDN setup.  | 2–3 days          |
+|                            | Security Hardening          | Define and implement access control, encryption, etc.| 2–3 days          |
+| **Maintenance**                 | Optimize & Maintain         | Periodic updates, tuning, and scaling.               | Ongoing           |
+|                                  | Security Monitoring         | Monitor security-related metrics in the stack.       | Ongoing          |
 
-## Phase 1: Local Development on WSL
+## Local Dev Environment w/ Local Monitoring App
 
-1. Set up Docker and Docker Compose in WSL.
-2. Create and test a basic monitoring stack with Prometheus and Grafana.
-3. Configure Prometheus to scrape local metrics.
-4. Verify functionality locally.
+Set up and test the entire monitoring stack in a local environment.
 
----
+1. Install Docker and Docker Compose on the local dev host.
+2. Set up the local adapter with an endpoint for system and Docker monitoring.
+3. Deploy Prometheus, Grafana, cAdvisor, and Node Exporter locally.
+4. Configure Prometheus to scrape metrics from the local adapter.
+5. Visualize metrics in Grafana.
 
-## Phase 2: Deployment on Hetzner Infrastructure
+### Local Host System and Docker Monitoring
 
-1. Set up Docker and Docker Compose on the Hetzner host.
-2. Transfer the monitoring stack configuration from WSL to the Hetzner host.
-3. Deploy the monitoring stack on Hetzner.
-4. Purchase a domain and configure DNS for remote access.
-5. Set up NGINX as a reverse proxy for Prometheus and Grafana.
-6. Secure remote access with SSL (optional).
+Set up system-level monitoring to track the health of the local host. Key tasks include:
+- Deploying Node Exporter and cAdvisor for metric collection.
+- Configuring both tools to expose metrics via an endpoint.
+- Configuring Prometheus to scrape metrics from these endpoints.
+- Verifying metrics such as CPU, RAM, disk usage, and system load.
 
----
+### Create Unified Dashboards
 
-## Phase 3: Monitor Docker Containers
+Design Grafana dashboards to integrate:
+- Host system metrics.
+- Docker container metrics.
+- Security metrics (e.g., failed login attempts, audit logs)
 
-1. Deploy cAdvisor on WSL to monitor Docker containers.
-2. Deploy cAdvisor on Hetzner to monitor Docker containers.
-3. Configure Prometheus to scrape metrics from both WSL and Hetzner cAdvisor instances.
-4. Verify Docker container metrics in Prometheus.
+## Add Hetzner Server Support
 
----
+1. Create and deploy the Hetzner adapter on the Hetzner server.
+2. Configure Prometheus to scrape metrics from the Hetzner adapter endpoint.
+3. Deploy Node Exporter and cAdvisor on Hetzner for system and Docker monitoring.
+4. Update Grafana dashboards to include Hetzner metrics.
 
-## Phase 4: Monitor Host Systems
+### Integrate Hetzner metrics into unified dashboards
 
-1. Deploy Node Exporter on WSL to monitor system metrics.
-2. Deploy Node Exporter on Hetzner to monitor system metrics.
-3. Configure Prometheus to scrape metrics from both WSL and Hetzner Node Exporter instances.
-4. Verify host system metrics in Prometheus.
+Integrate Hetzner-specific infrastructure into the unified monitoring solution:
+- Consolidate metrics from all sources—local host, Hetzner, and Docker containers—into Grafana dashboards.
+- Aggregate and logically group metrics for easier tracking and comparison.
+- Ensure dashboards are real-time and interactive.
 
----
+## Develop Alerts and Notifications
 
-## Phase 5: Integrate Azure Resources
+Set up robust alerts and notification systems to address key thresholds and system conditions.
 
-1. Enable Azure Monitor for the desired Azure resources.
-2. Install and configure the Azure Monitor plugin in Grafana.
-3. Create dashboards for Azure resources, such as:
-   - Static website uptime and performance.
-   - Storage account usage and metrics.
+**Objectives:**
+- Ensure timely notifications for system health and failures.
+- Create escalation rules for critical issues.
+- Test alert configurations to verify reliability.
 
----
-
-## Phase 6: Create Unified Dashboards
-
-1. Design Grafana dashboards to integrate:
-   - Docker container metrics.
-   - Host system metrics.
-   - Azure resource metrics.
-2. Combine all data sources into a single, unified view for end-to-end monitoring.
-
----
-
-## Phase 7: Set Up Alerts and Notifications
+***Tasks:**
 
 1. Deploy Prometheus Alertmanager.
 2. Configure alerting rules in Prometheus for:
    - High resource usage.
    - Service failures or downtime.
+   - Security monitoring (e.g., for abnormal access attempts or unauthorized changes).
 3. Set up Grafana alerts for key metrics.
-4. Configure notification channels (e.g., Slack, email).
+4. Configure notification channels, such as:
+   - Email.
+   - Slack or messaging services.
+   - Webhooks.
 
----
+## Add Azure Server Support
 
-## Phase 8: Work on Security
+1. Create and deploy the Azure adapter with an endpoint for metrics.
+2. Configure Prometheus to scrape metrics from the Azure adapter.
+3. Integrate Azure Monitor into Grafana to visualize metrics like:
+   - Website uptime and performance.
+   - Storage account usage.
+   - Virtual Machine (VM) health.
 
-1. **Define Security Requirements**:
+### Unified Dashboards
+
+Expand dashboards to incorporate Azure metrics:
+- Consolidate data from local host, Hetzner, Docker, and Azure into a unified view.
+- Aggregate metrics logically for consistency across all monitored environments.
+- Enhance interactivity for real-time monitoring and insights.
+
+## Production Environment
+
+1. Install Docker and Docker Compose on the Hetzner host.
+2. Transfer the monitoring stack configuration from WSL to Hetzner.
+3. Deploy the monitoring stack on Hetzner, including Prometheus, Grafana, and adapters.
+4. Set up NGINX as a reverse proxy for Grafana and Prometheus.
+5. Secure remote access with SSL (optional).
+6. Configure Prometheus to scrape metrics from Hetzner and Docker containers.
+7. Use a Fully Qualified Domain Name (FQDN) for remote access.
+
+### Security Hardening
+
+Secure the production environment to protect the monitoring solution from unauthorized access and attacks:
+
+- **Define Security Requirements**:
    - Identify sensitive components (e.g., credentials, FQDN, IPs).
-   - Determine required access control and encryption standards.
+   - Determine access control and encryption standards.
 
-2. **Secure Access to Monitoring Stack**:
-   - Implement role-based access control (RBAC) in Grafana.
-   - Secure Prometheus endpoints with basic authentication or reverse proxy rules.
+- **Secure Access**:
+   - Implement Role-Based Access Control (RBAC) for Grafana users.
+   - Use basic authentication or reverse proxy rules to secure Prometheus endpoints.
 
-3. **Protect Data in Transit**:
-   - Ensure HTTPS is enforced for all external access.
-   - Use VPN or firewall rules for internal communication between Prometheus, Grafana, and exporters.
+- **Protect Data in Transit**:
+   - Enforce HTTPS for all external access.
+   - Use VPN or firewall rules for internal communication between Prometheus, Grafana, and adapters.
 
-4. **Monitor the Security of the Solution**:
-   - Set up dashboards for monitoring unauthorized access attempts.
-   - Track SSL certificate expiration and renewal status.
+## Ongoing Maintenance
 
-5. **Stay Updated**:
-   - Regularly patch and update all software components (Docker images, Prometheus, Grafana, etc.).
-   - Monitor for vulnerabilities in the monitoring stack.
+Maintain and optimize the monitoring stack over time:
 
----
+- Regularly update all monitoring components (Docker images, Prometheus, Grafana, etc.).
+- Adjust scrape intervals and storage settings in Prometheus to handle data growth.
+- Periodically review and refine dashboards and alerts to match evolving requirements.
+- Add new monitored resources or environments as needed.
 
-## Phase 9: Optimize and Maintain
+### Security Monitoring
 
-1. Regularly update the monitoring stack and plugins.
-2. Optimize scrape intervals and storage settings in Prometheus.
-3. Review and refine dashboards and alerts periodically.
-4. Add monitoring for new resources or environments as needed.
+Monitor the security of the monitoring solution itself to detect and address vulnerabilities:
 
+1. Track unauthorized access attempts and failed login attempts.
+2. Set up alerts for suspicious activity within the monitoring stack.
+3. Monitor SSL certificate expiration and renewal.
+
+### Key Actions
+
+- Create dashboards to track security metrics like failed login attempts and certificate status.
+- Stay updated by patching vulnerabilities in the monitoring stack components.
