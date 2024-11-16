@@ -32,7 +32,39 @@ This architecture outlines the components and structure of the monitoring soluti
    - The monitored host adapters run independently, exposing metrics regardless of the Monitoring App's deployment.
    - Any monitored host can expose metrics to multiple Monitoring App deployments (e.g., both local and production instances).
 
----
+## Tech Stack
+
+This chapter outlines the key technologies and software that form the monitoring solution, along with their specific roles in the system:
+
+### Monitoring App
+
+| Tech/software | Role | Details | 
+|:-|:-|:-|
+| **Prometheus** | Central metrics collection and storage engine. | Scrapes metrics from adapters on monitored hosts and stores them for querying and alerting. It is the backbone of the monitoring system, enabling the pull-based collection of time-series data. |
+| **Grafana** | Visualization and dashboarding tool. | Provides a user-friendly interface for creating and viewing real-time dashboards. Grafana integrates with Prometheus to query and display metrics while also offering alerting functionality. |
+| **Alertmanager** | Notification and alert management. | Integrates with Prometheus to handle alerts generated based on predefined thresholds, distributing them via configured channels like email or Slack. | 
+| **NGINX**<br>(in Production Environment) | Reverse proxy and SSL terminator.  | Manages secure access to Prometheus and Grafana dashboards by serving as a reverse proxy and enabling HTTPS for external users. |
+| **Docker & Docker Compose** | Containerization and orchestration. | Used to deploy all components (Prometheus, Grafana, exporters, etc.) in isolated environments, ensuring portability and consistency across local and production setups. |
+
+### Adapters on Monitored Hosts
+
+| Tech/software | Role | Details | 
+|:-|:-|:-|
+| **Node Exporter** | Role: System metrics exporter. | Exposes hardware and OS-level metrics such as CPU usage, memory usage, and disk performance for Prometheus to scrape. |
+| **cAdvisor** | Docker container metrics exporter. | Collects detailed metrics on running containers, including resource usage and performance data. |
+| **Custom Adapters** | Extend monitoring to custom applications or services. | These may include scripts or tools tailored to specific use cases, such as monitoring databases or web servers. |
+| **Azure Monitor (optional)**: |  Native Azure metrics collection. | Integrated into the monitoring system to gather metrics from Azure-specific resources such as VMs or storage accounts. |
+
+### Alternative Technologies
+
+While the chosen tech stack leverages widely used and robust tools, alternatives could be considered depending on specific needs:
+
+- **Telegraf + InfluxDB + Chronograf**: A comparable stack with Telegraf for data collection, InfluxDB for time-series storage, and Chronograf for visualization. This stack is a strong contender but lacks some of the flexibility and ecosystem integration of Prometheus and Grafana.
+- **Elastic Stack (ELK/EFK)**: ElasticSearch for data storage, Kibana for visualization, and Beats for metric collection. This solution offers powerful search capabilities and scalability but may be overkill for simpler monitoring setups.
+- **Zabbix**: A comprehensive monitoring system that combines data collection, visualization, and alerting in a single package. However, it has a steeper learning curve and may be less flexible for containerized environments.
+- **OpenTelemetry**: A vendor-neutral option for observability. While OpenTelemetry excels at tracing and logs, it can also collect metrics but requires additional effort to integrate with storage and visualization tools.
+
+The current stack was chosen for its balance of simplicity, flexibility, and broad community support, making it suitable for both hobby projects and scalable production environments.
 
 ## Monitoring App
 
@@ -69,8 +101,6 @@ The **Monitoring App** is the centralized system responsible for collecting, sto
 - Alerts for container failures or high resource usage in the local environment.
 - Alerts for system-level failures, resource over-utilization, or other critical issues on hosts.
 - Configurable to send alerts via email, Slack, or other messaging systems.
-
----
 
 ## Adapter on Monitored Host
 
