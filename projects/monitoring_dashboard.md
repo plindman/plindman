@@ -2,6 +2,46 @@
 
 This project plan outlines all steps required to create a comprehensive monitoring solution integrating WSL, Hetzner, and Azure resources into a unified dashboard.
 
+This plan ensures a scalable and unified monitoring solution across the infrastructure.
+
+| **Phase**                       | **Description**                                      | **Expected Time** |
+|----------------------------------|------------------------------------------------------|-------------------|
+| **Phase 1: Local Development**  | Set up and test monitoring stack on WSL.             | 1–2 days          |
+| **Phase 2: Hetzner Deployment** | Deploy monitoring stack on Hetzner with FQDN setup.  | 2–3 days          |
+| **Phase 3: Docker Monitoring**  | Monitor Docker containers on WSL and Hetzner.        | 1–2 days          |
+| **Phase 4: Host Monitoring**    | Monitor system metrics on WSL and Hetzner hosts.     | 1–2 days          |
+| **Phase 5: Azure Integration**  | Integrate Azure resources into Grafana dashboards.   | 1–2 days          |
+| **Phase 6: Unified Dashboards** | Create unified dashboards in Grafana.                | 1 day             |
+| **Phase 7: Alerts & Notifications** | Set up alerts and notifications for key metrics.  | 1 day             |
+| **Phase 8: Security**           | Define, secure, and monitor the solution’s security. | 2–3 days          |
+| **Phase 9: Optimize & Maintain**| Periodic updates, tuning, and scaling.               | Ongoing           |
+
+https://mermaid.js.org/syntax/gantt.html
+
+:::mermaid
+gantt
+    title Project Plan for Monitoring Solution
+    dateFormat  D
+    axisFormat  %d
+    
+    section Infrastructure Integration
+    Phase 1: Local Development    :p1, 1, 2d
+    Phase 2: Hetzner Deployment   :p2, after p1, 4d
+    Phase 3: Docker Monitoring    :p3, after p2, 3d
+    Phase 4: Host Monitoring      :p4, after p3, 3d
+
+    section Cloud Integration
+    Phase 5: Azure Integration    :p5, after p1, 3d
+
+    section Dashboards & Visualization
+    Phase 6: Unified Dashboards   :p6, after p3 p4 p5, 2d
+    Phase 7: Alerts & Notifications :p7, after p6, 2d
+
+    section Security and Maintenance
+    Phase 8: Security             :p8, after p2, 3d
+    Phase 9: Optimize & Maintain  :p9, 2024-11-25, 5d
+:::
+
 ---
 
 ## Phase 1: Local Development on WSL
@@ -104,6 +144,3 @@ This project plan outlines all steps required to create a comprehensive monitori
 3. Review and refine dashboards and alerts periodically.
 4. Add monitoring for new resources or environments as needed.
 
----
-
-This plan ensures a scalable and unified monitoring solution across your infrastructure. Let me know if you'd like further elaboration on any phase!
