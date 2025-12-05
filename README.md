@@ -18,7 +18,7 @@ Connect with me professionally on [LinkedIn](https://www.linkedin.com/in/pontusl
 
 ## 🎓 Tech Stack & Skills
 
-- **Programming Languages**: Currently mostly Python and Javascript, but not afraid to grab any tech that helps me solve the problem. In the past, deep C/C++ know-how.
+- **Programming Languages**: Currently mostly TypeScript andPython, but not afraid to grab any tech that helps me solve the problem. In the past, deep C/C++ know-how.
 - **Technologies**: AI/ML, Data Engineering, DevOps
 
 I'm always keen to discuss topics like **AI advancements**, **data science**.
